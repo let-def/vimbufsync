@@ -192,8 +192,8 @@ class ShadowBuffer:
        guaranteed to match current contents"""
     line = self._find_changed_line()
     if line:
-      line_max = min(len(self._shadow),len(self._buf)) - 1
-      line = min(line,line_max + 1)
+      line_max = min(len(self._shadow),len(self._buf))
+      line = min(line,line_max)
       # heuristic: find 3 equal non-blank lines in a row
       in_a_row = 0
       line_count = 0
@@ -211,9 +211,10 @@ class ShadowBuffer:
       while line < line_max and self._shadow[line] == self._buf[line]:
         line += 1
       # find changed column
-      if line in self._shadow and line in self._buf:
+      if line < line_max:
         s1 = self._shadow[line]
         s2 = self._buf[line]
+        print ("comparing: '" + s1 + "' with '" + s2 + "'")
         col = [i for i,(a1,a2)  in enumerate(izip(s1,s2)) if a1!=a2]
         if col: col = col[0]+1
         else:   col = min(len(s1),len(s2))+1
