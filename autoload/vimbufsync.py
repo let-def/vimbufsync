@@ -210,15 +210,7 @@ class ShadowBuffer:
       # increment line while unchanged
       while line < line_max and self._shadow[line] == self._buf[line]:
         line += 1
-      # Switch back to 1-indexed array
-      line += 1
-      # update shadow buffer
-      if line < 1:
-        self._shadow[:] = self._buf[:]
-      else:
-        self._shadow[line-1:] = self._buf[line-1:]
-
-      # new revision
+      # find changed column
       if line in self._shadow and line in self._buf:
         s1 = self._shadow[line]
         s2 = self._buf[line]
@@ -227,6 +219,14 @@ class ShadowBuffer:
         else:   col = min(len(s1),len(s2))+1
       else:
         col = 1
+      # Switch back to 1-indexed array
+      line += 1
+      # update shadow buffer
+      if line < 1:
+        self._shadow[:] = self._buf[:]
+      else:
+        self._shadow[line-1:] = self._buf[line-1:]
+      # new revision
       self._invalidate_lines(line,col)
     return self.revision()
 
