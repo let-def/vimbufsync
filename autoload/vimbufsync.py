@@ -22,7 +22,11 @@ import re
 import os
 import sys
 import bisect
-from itertools import groupby, izip
+from itertools import groupby
+
+if sys.version_info < (3,0):
+    from itertools import izip
+    zip = izip
 
 version = [0,1,0] # 0.1.0
 
@@ -63,7 +67,7 @@ def extract_changes(nr):
   global changes_pattern
   # compute changes as a list of match objects
   changes = changes_of_buffer(nr)
-  changes = filter(None,map(changes_pattern.match,changes))
+  changes = list(filter(None,map(changes_pattern.match,changes)))
   if len(changes) == 0:
     return None
   # find current position in change list
@@ -212,7 +216,7 @@ class ShadowBuffer:
       if line < line_max:
         s1 = self._shadow[line]
         s2 = self._buf[line]
-        col = [i for i,(a1,a2)  in enumerate(izip(s1,s2)) if a1!=a2]
+        col = [i for i,(a1,a2) in enumerate(zip(s1,s2)) if a1!=a2]
         if col: col = col[0]+1
         else:   col = min(len(s1),len(s2))+1
       else:
